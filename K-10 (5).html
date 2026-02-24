@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07070d">
+<meta name="description" content="K-10 Language Model by L Gamest — An independent AI language model you can embed in your project.">
+<title>K-10 · Language Model by L Gamest</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #07070d;
+  --s1:      #0f0f1a;
+  --s2:      #16162a;
+  --s3:      #1e1e36;
+  --border:  #252540;
+  --border2: #33335a;
+  --accent:  #6366f1;
+  --accent2: #a78bfa;
+  --glow:    rgba(99,102,241,0.18);
+  --text:    #eeeef5;
+  --text2:   #9898b8;
+  --muted:   #55556a;
+  --green:   #34d399;
+  --red:     #f87171;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; overflow:hidden; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Sora',sans-serif;
+  display:flex; flex-direction:column;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 55% 35% at 15% 10%,rgba(99,102,241,.07) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 25% at 85% 90%,rgba(167,139,250,.05) 0%,transparent 65%);
+  pointer-events:none; z-index:0;
+}
+body::after {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(99,102,241,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(99,102,241,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none; z-index:0;
+}
+
+/* ═══ HEADER ═══ */
+header {
+  position:relative; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px;
+  background:rgba(15,15,26,.96);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  flex-shrink:0;
+}
+.logo { display:flex; align-items:center; gap:11px; }
+.logo-mark {
+  width:38px; height:38px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Space Mono',monospace; font-size:11px; font-weight:700; color:#fff;
+  box-shadow:0 0 22px var(--glow); flex-shrink:0; letter-spacing:.02em;
+}
+.logo-info { display:flex; flex-direction:column; gap:1px; }
+.logo-name { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; letter-spacing:.05em; }
+.logo-sub  { font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+.header-actions { display:flex; gap:7px; }
+.hbtn {
+  padding:6px 13px; border-radius:7px; border:none;
+  cursor:pointer; font-family:'Sora',sans-serif; font-size:12px; font-weight:500;
+  transition:all .18s;
+}
+.hbtn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border2); }
+.hbtn-ghost:hover { color:var(--text); border-color:var(--accent); background:rgba(99,102,241,.08); }
+.hbtn-accent {
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; box-shadow:0 0 14px var(--glow);
+}
+.hbtn-accent:hover { opacity:.85; transform:translateY(-1px); }
+
+/* ═══ LAYOUT ═══ */
+.app {
+  display:flex; flex:1;
+  height:calc(100dvh - 63px);
+  position:relative; z-index:1;
+  overflow:hidden;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width:230px; flex-shrink:0;
+  background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:10px; overflow:hidden;
+}
+.nav-label { font-size:9px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); padding:8px 8px 4px; }
+.nav-btn {
+  display:flex; align-items:center; gap:9px;
+  padding:9px 10px; border-radius:8px;
+  cursor:pointer; font-size:13px; font-weight:400;
+  color:var(--text2); transition:all .15s;
+  background:none; border:none; width:100%;
+  font-family:'Sora',sans-serif; text-align:left;
+}
+.nav-btn:hover { background:var(--s2); color:var(--text); }
+.nav-btn.active { background:rgba(99,102,241,.12); color:var(--accent); font-weight:500; }
+.nav-icon { font-size:14px; width:18px; text-align:center; opacity:.75; }
+.nav-btn.active .nav-icon { opacity:1; }
+.k-count {
+  margin-left:auto;
+  background:rgba(99,102,241,.15); color:var(--accent);
+  font-size:10px; font-weight:600;
+  padding:2px 7px; border-radius:20px;
+  border:1px solid rgba(99,102,241,.2);
+}
+.sidebar-foot { margin-top:auto; border-top:1px solid var(--border); padding-top:10px; }
+.admin-pill {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 10px; border-radius:8px;
+  background:rgba(99,102,241,.07);
+  border:1px solid rgba(99,102,241,.15);
+}
+.dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.dot-on  { background:var(--green); }
+.dot-off { background:var(--muted); }
+
+/* ─── PANELS ─── */
+.panel { display:none; flex-direction:column; flex:1; overflow:hidden; }
+.panel.active { display:flex; }
+
+/* ═══ CHAT ═══ */
+.chat-feed {
+  flex:1; overflow-y:auto;
+  padding:24px 28px;
+  display:flex; flex-direction:column; gap:16px;
+  scroll-behavior:smooth;
+}
+.chat-feed::-webkit-scrollbar { width:3px; }
+.chat-feed::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+.welcome {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; flex:1; text-align:center; padding:32px 20px;
+}
+.w-icon {
+  width:76px; height:76px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Space Mono',monospace; font-size:22px; font-weight:700; color:#fff;
+  margin-bottom:22px;
+  box-shadow:0 0 50px rgba(99,102,241,.28);
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform:translateY(0); box-shadow:0 0 50px rgba(99,102,241,.25); }
+  50%      { transform:translateY(-7px); box-shadow:0 12px 60px rgba(99,102,241,.38); }
+}
+.welcome h2 { font-size:22px; font-weight:600; margin-bottom:8px; }
+.welcome p  { color:var(--text2); font-size:14px; line-height:1.7; max-width:400px; }
+.notice {
+  margin-top:20px; padding:13px 18px;
+  border:1px solid var(--border2); border-radius:10px;
+  background:var(--s2); max-width:440px; text-align:left;
+}
+.notice p { font-size:11px; line-height:1.8; color:var(--muted); }
+.notice strong { color:var(--text2); }
+
+.msg { display:flex; gap:11px; animation:msgIn .22s ease; }
+@keyframes msgIn { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+.msg.user { flex-direction:row-reverse; }
+.av {
+  width:30px; height:30px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; flex-shrink:0;
+  font-family:'Space Mono',monospace;
+}
+.av.k { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; box-shadow:0 0 12px var(--glow); }
+.av.u { background:var(--s3); color:var(--text2); border:1px solid var(--border2); font-size:14px; }
+.bubble { max-width:66%; padding:11px 15px; border-radius:13px; font-size:13.5px; line-height:1.65; }
+.msg.bot  .bubble { background:var(--s2); border:1px solid var(--border); border-top-left-radius:3px; }
+.msg.user .bubble { background:rgba(99,102,241,.14); border:1px solid rgba(99,102,241,.24); border-top-right-radius:3px; }
+
+.typing-dots { display:flex; align-items:center; gap:4px; padding:6px 2px; }
+.td { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:td 1.2s ease-in-out infinite; }
+.td:nth-child(2) { animation-delay:.2s; }
+.td:nth-child(3) { animation-delay:.4s; }
+@keyframes td { 0%,80%,100%{transform:translateY(0);opacity:.4} 40%{transform:translateY(-5px);opacity:1} }
+
+.chat-bar {
+  padding:14px 20px 18px;
+  border-top:1px solid var(--border);
+  background:rgba(15,15,26,.9);
+  backdrop-filter:blur(12px);
+  flex-shrink:0;
+}
+.input-wrap {
+  display:flex; gap:9px; align-items:flex-end;
+  background:var(--s2); border:1px solid var(--border2); border-radius:12px;
+  padding:9px 13px; transition:border-color .2s,box-shadow .2s;
+}
+.input-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+#chatInput {
+  flex:1; background:none; border:none; outline:none;
+  color:var(--text); font-family:'Sora',sans-serif; font-size:13.5px;
+  resize:none; max-height:110px; line-height:1.5;
+}
+#chatInput::placeholder { color:var(--muted); }
+#sendBtn {
+  width:34px; height:34px; border-radius:8px; border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:14px; flex-shrink:0;
+  box-shadow:0 0 10px var(--glow); transition:all .18s;
+}
+#sendBtn:hover { opacity:.82; transform:scale(1.06); }
+#sendBtn:disabled { opacity:.3; cursor:not-allowed; transform:none; }
+.bar-hint { font-size:10.5px; color:var(--muted); margin-top:6px; text-align:center; }
+
+/* ═══ KNOWLEDGE PANEL ═══ */
+.phead { padding:18px 24px 14px; border-bottom:1px solid var(--border); background:var(--s1); flex-shrink:0; }
+.phead h2 { font-size:17px; font-weight:600; margin-bottom:2px; }
+.phead p  { font-size:12.5px; color:var(--text2); }
+.pcontent { flex:1; overflow-y:auto; padding:22px 24px; }
+.pcontent::-webkit-scrollbar { width:3px; }
+.pcontent::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+.flabel { display:block; font-size:11px; font-weight:500; color:var(--text2); margin-bottom:6px; letter-spacing:.04em; }
+.finput,.ftextarea {
+  width:100%; background:var(--s2);
+  border:1px solid var(--border2); border-radius:8px;
+  color:var(--text); font-family:'Sora',sans-serif; font-size:13px;
+  padding:9px 13px; outline:none; transition:border-color .18s,box-shadow .18s;
+}
+.ftextarea { min-height:100px; resize:vertical; line-height:1.6; }
+.finput:focus,.ftextarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+.finput::placeholder,.ftextarea::placeholder { color:var(--muted); }
+.fgroup { margin-bottom:15px; }
+.btn-add {
+  width:100%; padding:10px; border-radius:9px; border:none;
+  cursor:pointer; font-family:'Sora',sans-serif; font-size:13.5px; font-weight:500;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; box-shadow:0 0 18px var(--glow); transition:all .18s;
+}
+.btn-add:hover { opacity:.85; transform:translateY(-1px); }
+.divider { border:none; border-top:1px solid var(--border); margin:22px 0; }
+.klist-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:13px; }
+.klist-head h3 { font-size:13px; font-weight:600; color:var(--text2); }
+.klist-sub { font-size:11px; color:var(--muted); font-weight:400; }
+.btn-sm {
+  padding:4px 10px; border-radius:6px; border:1px solid var(--border2);
+  background:transparent; color:var(--text2); cursor:pointer;
+  font-family:'Sora',sans-serif; font-size:11px; transition:all .15s;
+}
+.btn-sm:hover { color:var(--red); border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.07); }
+.klist { display:flex; flex-direction:column; gap:9px; }
+.kcard {
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:9px; padding:13px 14px;
+  display:flex; align-items:flex-start; gap:11px;
+  transition:border-color .18s; animation:cardIn .22s ease;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+.kcard:hover { border-color:var(--border2); }
+.kcard-body { flex:1; min-width:0; }
+.kc-topic { font-size:12.5px; font-weight:600; color:var(--accent2); margin-bottom:3px; }
+.kc-ans   { font-size:12.5px; color:var(--text2); line-height:1.55; word-break:break-word; }
+.kc-del {
+  background:none; border:none; cursor:pointer;
+  color:var(--muted); font-size:13px; padding:3px 5px;
+  border-radius:5px; transition:all .15s; flex-shrink:0;
+}
+.kc-del:hover { color:var(--red); background:rgba(248,113,113,.1); }
+.empty-k { text-align:center; padding:36px 20px; color:var(--muted); font-size:13px; }
+.empty-k .ei { font-size:32px; margin-bottom:10px; opacity:.4; }
+.kfoot { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
+.kfoot .btn-sm { font-size:11.5px; padding:6px 12px; }
+.kfoot .logout-btn { margin-left:auto; }
+.kfoot .logout-btn:hover { color:var(--red); border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.07); }
+
+/* ═══ ABOUT ═══ */
+.asection { margin-bottom:26px; }
+.asection h3 { font-size:12px; font-weight:600; color:var(--accent2); margin-bottom:8px; text-transform:uppercase; letter-spacing:.07em; }
+.asection p  { font-size:13px; color:var(--text2); line-height:1.75; }
+.embed-wrap {
+  background:var(--s3); border:1px solid var(--border2);
+  border-radius:9px; padding:14px 15px; position:relative; overflow:hidden;
+}
+.embed-wrap code {
+  font-family:'Space Mono',monospace; font-size:11.5px;
+  color:var(--accent2); display:block; white-space:pre; line-height:1.65; overflow-x:auto;
+}
+.copy-btn {
+  position:absolute; top:10px; right:10px;
+  padding:4px 10px; border-radius:6px; border:none;
+  background:var(--accent); color:#fff;
+  font-size:11px; cursor:pointer;
+  font-family:'Sora',sans-serif; transition:all .15s;
+}
+.copy-btn:hover { opacity:.8; }
+.legal { border-top:1px solid var(--border); padding-top:20px; margin-top:4px; }
+.legal p { font-size:11.5px; color:var(--muted); line-height:1.8; }
+
+/* ═══ MODALS ═══ */
+.overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(7,7,13,.88);
+  backdrop-filter:blur(10px);
+  z-index:999; align-items:center; justify-content:center; padding:16px;
+}
+.overlay.show { display:flex; }
+.modal {
+  background:var(--s1); border:1px solid var(--border2);
+  border-radius:16px; padding:28px 24px;
+  width:100%; max-width:360px;
+  box-shadow:0 24px 80px rgba(0,0,0,.55);
+  animation:mIn .2s ease;
+}
+@keyframes mIn { from{opacity:0;transform:scale(.93) translateY(-10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal-icon {
+  width:48px; height:48px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:12px; display:flex; align-items:center; justify-content:center;
+  font-size:20px; margin-bottom:14px; box-shadow:0 0 22px var(--glow);
+}
+.modal h3 { font-size:17px; font-weight:600; margin-bottom:5px; }
+.modal > p { font-size:12.5px; color:var(--text2); margin-bottom:18px; line-height:1.6; }
+.merr { font-size:12px; color:var(--red); margin-top:8px; display:none; }
+.merr.show { display:block; }
+.mfoot { display:flex; gap:8px; margin-top:16px; }
+.mfoot .hbtn { flex:1; padding:10px; font-size:13px; }
+.pin-hint { font-size:10.5px; color:var(--muted); margin-top:4px; }
+
+/* ═══ TOAST ═══ */
+.toast {
+  position:fixed; bottom:20px; right:20px;
+  background:var(--s2); border:1px solid var(--border2);
+  border-radius:9px; padding:11px 16px;
+  font-size:12.5px; color:var(--text);
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+  z-index:9999; display:none; max-width:280px;
+  animation:tIn .18s ease;
+}
+@keyframes tIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.toast.show { display:block; }
+.toast.ok  { border-left:3px solid var(--green); }
+.toast.err { border-left:3px solid var(--red); }
+.toast.inf { border-left:3px solid var(--accent); }
+
+@media(max-width:600px){
+  .sidebar { width:0; padding:0; border:none; overflow:hidden; }
+  .chat-feed { padding:16px; }
+  .pcontent  { padding:16px; }
+  header { padding:10px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ░░ HEADER ░░ -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">K-10</div>
+    <div class="logo-info">
+      <span class="logo-name">K-10</span>
+      <span class="logo-sub">Language Model · L Gamest</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="hbtn hbtn-ghost" onclick="showPanel('about')">About</button>
+    <button class="hbtn hbtn-accent" onclick="onKnowledgeClick()">⚙ Knowledge Panel</button>
+  </div>
+</header>
+
+<!-- ░░ APP ░░ -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-label">Menu</div>
+    <button class="nav-btn active" id="nb-chat" onclick="showPanel('chat')">
+      <span class="nav-icon">💬</span> Chat
+    </button>
+    <button class="nav-btn" id="nb-about" onclick="showPanel('about')">
+      <span class="nav-icon">ℹ️</span> About
+    </button>
+    <button class="nav-btn" id="nb-knowledge" onclick="onKnowledgeClick()">
+      <span class="nav-icon">🧠</span> Knowledge Panel
+      <span class="k-count" id="kCount">0</span>
+    </button>
+    <div class="sidebar-foot">
+      <div class="admin-pill">
+        <div class="dot dot-off" id="aDot"></div>
+        <span id="aLabel" style="font-size:12px;color:var(--muted)">Not signed in</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CHAT PANEL -->
+  <div class="panel active" id="panel-chat">
+    <div class="chat-feed" id="feed">
+      <div class="welcome" id="welcomeMsg">
+        <div class="w-icon">K-10</div>
+        <h2>Hello, I'm K-10</h2>
+        <p>An independent language model by L Gamest. Ask me anything — I'll answer from what I've been trained on.</p>
+        <div class="notice">
+          <p>
+            <strong>Not affiliated with OpenAI and not created by it.</strong><br>
+            K-10 is of L Gamest. This language model is supposed to be added (embedded) to your project/chatbot if you want.<br><br>
+            To add K-10 to your project, embed this web app on your site.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="chat-bar">
+      <div class="input-wrap">
+        <textarea id="chatInput" rows="1"
+          placeholder="Ask K-10 something…"
+          onkeydown="onKey(event)"
+          oninput="grow(this)"></textarea>
+        <button id="sendBtn" onclick="send()">➤</button>
+      </div>
+      <p class="bar-hint">K-10 answers only from trained knowledge &nbsp;·&nbsp; Shift+Enter for new line</p>
+    </div>
+  </div>
+
+  <!-- KNOWLEDGE PANEL -->
+  <div class="panel" id="panel-knowledge">
+    <div class="phead">
+      <h2>🧠 Knowledge Panel</h2>
+      <p>Add topics and answers to train K-10. Only you can access this.</p>
+    </div>
+    <div class="pcontent">
+      <div class="fgroup">
+        <label class="flabel">TOPIC / QUESTION</label>
+        <input class="finput" id="kTopic" type="text" placeholder="e.g. What is L Gamest?">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">ANSWER / KNOWLEDGE</label>
+        <textarea class="ftextarea" id="kAnswer" placeholder="e.g. L Gamest is a technology company that builds AI-powered tools…"></textarea>
+      </div>
+      <button class="btn-add" onclick="addEntry()">＋ Add Knowledge Entry</button>
+      <hr class="divider">
+      <div class="klist-head">
+        <h3>Trained Knowledge <span class="klist-sub" id="kLabel">(0 entries)</span></h3>
+      </div>
+      <div class="klist" id="klist">
+        <div class="empty-k"><div class="ei">🧩</div><p>No knowledge yet.<br>Add your first entry above.</p></div>
+      </div>
+      <hr class="divider">
+      <div class="kfoot">
+        <button class="btn-sm" onclick="exportK()">⬇ Export</button>
+        <label class="btn-sm" style="cursor:pointer">
+          ⬆ Import
+          <input type="file" accept=".json" style="display:none" onchange="importK(event)">
+        </label>
+        <button class="btn-sm" onclick="clearAll()">🗑 Clear All</button>
+        <button class="btn-sm logout-btn" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT PANEL -->
+  <div class="panel" id="panel-about">
+    <div class="phead">
+      <h2>ℹ️ About K-10</h2>
+      <p>Independent language model by L Gamest.</p>
+    </div>
+    <div class="pcontent">
+      <div class="asection">
+        <h3>What is K-10?</h3>
+        <p>K-10 is a fully independent language model built and owned by <strong style="color:var(--text)">L Gamest</strong>. It is not affiliated with OpenAI, Google, Microsoft, Meta, or any other AI company. K-10 answers only from knowledge its admin trains it on.</p>
+      </div>
+      <div class="asection">
+        <h3>How it works</h3>
+        <p>The admin adds topic-and-answer pairs through the Knowledge Panel. When users ask questions, K-10 searches its trained knowledge and finds the best matching response. If nothing matches, K-10 says so honestly.</p>
+      </div>
+      <div class="asection">
+        <h3>Fully independent account</h3>
+        <p>K-10 uses its own account system — your name + a PIN you choose. No Google, Microsoft, Meta, email verification, or any third-party service involved. Everything is stored locally in the browser.</p>
+      </div>
+      <div class="asection">
+        <h3>Embed K-10 in your project</h3>
+        <p style="margin-bottom:11px">Copy this code to embed K-10 as a web app in your project:</p>
+        <div class="embed-wrap">
+          <code id="embedCode"></code>
+          <button class="copy-btn" onclick="copyEmbed()">Copy</button>
+        </div>
+      </div>
+      <div class="asection legal">
+        <h3>Legal Notice</h3>
+        <p>
+          <strong style="color:var(--text2)">Not affiliated with OpenAI and not created by it.</strong><br>
+          K-10 is of L Gamest. This language model is supposed to be added (embedded) to your project/chatbot if you want.<br><br>
+          © L Gamest · All rights reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ░░ LOGIN MODAL ░░ -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <div class="modal-icon">🔐</div>
+    <h3>Admin Sign In</h3>
+    <p>Enter your name and PIN to access the Knowledge Panel. Fully independent — no external account needed.</p>
+    <div class="fgroup">
+      <label class="flabel">YOUR NAME</label>
+      <input class="finput" id="lName" type="text" placeholder="e.g. Liam" autocomplete="off" autocapitalize="words">
+    </div>
+    <div class="fgroup">
+      <label class="flabel">YOUR PIN</label>
+      <input class="finput" id="lPin" type="password" placeholder="Enter your PIN" maxlength="12" inputmode="numeric">
+    </div>
+    <div class="merr" id="lErr">Incorrect name or PIN.</div>
+    <div class="mfoot">
+      <button class="hbtn hbtn-ghost" onclick="closeLogin()">Cancel</button>
+      <button class="hbtn hbtn-accent" onclick="tryLogin()">Sign In →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ░░ SETUP MODAL ░░ -->
+<div class="overlay" id="setupOverlay">
+  <div class="modal">
+    <div class="modal-icon">🚀</div>
+    <h3>Create Admin Account</h3>
+    <p>First-time setup for K-10. Choose your name and a PIN. Stored only in this browser — no email, no external service.</p>
+    <div class="fgroup">
+      <label class="flabel">YOUR NAME</label>
+      <input class="finput" id="sName" type="text" placeholder="e.g. Liam" autocomplete="off" autocapitalize="words">
+    </div>
+    <div class="fgroup">
+      <label class="flabel">CHOOSE A PIN</label>
+      <input class="finput" id="sPin" type="password" placeholder="4–12 digits" maxlength="12" inputmode="numeric">
+      <p class="pin-hint">Numbers only, 4–12 digits</p>
+    </div>
+    <div class="fgroup">
+      <label class="flabel">CONFIRM PIN</label>
+      <input class="finput" id="sPinC" type="password" placeholder="Repeat your PIN" maxlength="12" inputmode="numeric">
+    </div>
+    <div class="merr" id="sErr"></div>
+    <div class="mfoot">
+      <button class="hbtn hbtn-accent" style="flex:1;padding:11px" onclick="createAccount()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ── Storage Keys ──
+const K_DATA    = 'k10_kb';
+const K_ADMIN   = 'k10_admin';
+const K_SESSION = 'k10_session';
+
+// ── State ──
+let adminLoggedIn = false;
+let admin = null;   // { name, pin }
+let kb    = [];     // [ { id, topic, answer } ]
+let busy  = false;
+
+// ──────────────────────
+//  BOOT
+// ──────────────────────
+(function init() {
+  try { admin = JSON.parse(localStorage.getItem(K_ADMIN)); } catch(e) {}
+  try { kb    = JSON.parse(localStorage.getItem(K_DATA)) || []; } catch(e) {}
+  if (localStorage.getItem(K_SESSION) === '1' && admin) {
+    adminLoggedIn = true;
+    refreshAdminUI();
+  }
+  refreshKbUI();
+  setEmbedCode();
+})();
+
+// ──────────────────────
+//  NAVIGATION
+// ──────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const nb = document.getElementById('nb-' + name);
+  if (nb) nb.classList.add('active');
+}
+
+function onKnowledgeClick() {
+  if (adminLoggedIn) {
+    showPanel('knowledge');
+    document.getElementById('nb-knowledge').classList.add('active');
+  } else {
+    openAuth();
+  }
+}
+
+// ──────────────────────
+//  AUTH
+// ──────────────────────
+function openAuth() {
+  if (!admin) {
+    document.getElementById('setupOverlay').classList.add('show');
+    setTimeout(() => document.getElementById('sName').focus(), 80);
+  } else {
+    document.getElementById('loginOverlay').classList.add('show');
+    setTimeout(() => document.getElementById('lName').focus(), 80);
+  }
+}
+
+function closeLogin() {
+  document.getElementById('loginOverlay').classList.remove('show');
+  document.getElementById('lErr').classList.remove('show');
+  document.getElementById('lName').value = '';
+  document.getElementById('lPin').value  = '';
+}
+
+function tryLogin() {
+  const name = document.getElementById('lName').value.trim();
+  const pin  = document.getElementById('lPin').value.trim();
+  if (!name || !pin) { showLErr('Please enter your name and PIN.'); return; }
+  if (name.toLowerCase() === admin.name.toLowerCase() && pin === admin.pin) {
+    adminLoggedIn = true;
+    localStorage.setItem(K_SESSION, '1');
+    closeLogin();
+    refreshAdminUI();
+    showPanel('knowledge');
+    document.getElementById('nb-knowledge').classList.add('active');
+    toast('Welcome back, ' + admin.name + '!', 'ok');
+  } else {
+    showLErr('Incorrect name or PIN. Please try again.');
+  }
+}
+
+function showLErr(msg) {
+  const e = document.getElementById('lErr');
+  e.textContent = msg; e.classList.add('show');
+}
+
+function createAccount() {
+  const name = document.getElementById('sName').value.trim();
+  const pin  = document.getElementById('sPin').value.trim();
+  const pinC = document.getElementById('sPinC').value.trim();
+  const err  = document.getElementById('sErr');
+  const fail = m => { err.textContent = m; err.classList.add('show'); };
+
+  if (!name || !pin || !pinC)   return fail('Please fill in all fields.');
+  if (name.length < 2)           return fail('Name must be at least 2 characters.');
+  if (!/^\d{4,12}$/.test(pin))  return fail('PIN must be 4–12 digits (numbers only).');
+  if (pin !== pinC)              return fail('PINs do not match.');
+
+  admin = { name, pin };
+  localStorage.setItem(K_ADMIN, JSON.stringify(admin));
+  adminLoggedIn = true;
+  localStorage.setItem(K_SESSION, '1');
+
+  document.getElementById('setupOverlay').classList.remove('show');
+  refreshAdminUI();
+  showPanel('knowledge');
+  document.getElementById('nb-knowledge').classList.add('active');
+  toast('Account created! Welcome, ' + name + ' 🎉', 'ok');
+}
+
+function logout() {
+  adminLoggedIn = false;
+  localStorage.removeItem(K_SESSION);
+  refreshAdminUI();
+  showPanel('chat');
+  document.getElementById('nb-chat').classList.add('active');
+  document.getElementById('nb-knowledge').classList.remove('active');
+  toast('Signed out.', 'inf');
+}
+
+function refreshAdminUI() {
+  const dot = document.getElementById('aDot');
+  const lbl = document.getElementById('aLabel');
+  if (adminLoggedIn && admin) {
+    dot.className = 'dot dot-on';
+    lbl.textContent = admin.name + ' (Admin)';
+    lbl.style.color = 'var(--green)';
+  } else {
+    dot.className = 'dot dot-off';
+    lbl.textContent = 'Not signed in';
+    lbl.style.color = 'var(--muted)';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeLogin();
+    document.getElementById('setupOverlay').classList.remove('show');
+  }
+  if (e.key === 'Enter') {
+    if (document.getElementById('loginOverlay').classList.contains('show')) tryLogin();
+    if (document.getElementById('setupOverlay').classList.contains('show')) createAccount();
+  }
+});
+
+// ──────────────────────
+//  KNOWLEDGE BASE
+// ──────────────────────
+function saveKb() {
+  localStorage.setItem(K_DATA, JSON.stringify(kb));
+  refreshKbUI();
+}
+
+function addEntry() {
+  if (!adminLoggedIn) return;
+  const topic  = document.getElementById('kTopic').value.trim();
+  const answer = document.getElementById('kAnswer').value.trim();
+  if (!topic)  { toast('Please enter a topic.', 'err'); return; }
+  if (!answer) { toast('Please enter an answer.', 'err'); return; }
+  kb.push({ id: Date.now().toString(), topic, answer });
+  saveKb();
+  document.getElementById('kTopic').value  = '';
+  document.getElementById('kAnswer').value = '';
+  toast('Knowledge entry added!', 'ok');
+}
+
+function deleteEntry(id) {
+  kb = kb.filter(e => e.id !== id);
+  saveKb();
+  toast('Entry removed.', 'inf');
+}
+
+function clearAll() {
+  if (!kb.length) { toast('Nothing to clear.', 'inf'); return; }
+  if (!confirm('Delete all ' + kb.length + ' entries? This cannot be undone.')) return;
+  kb = [];
+  saveKb();
+  toast('All knowledge cleared.', 'inf');
+}
+
+function exportK() {
+  const blob = new Blob([JSON.stringify(kb, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'k10-knowledge.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported!', 'ok');
+}
+
+function importK(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw 0;
+      if (!confirm('Import ' + data.length + ' entries (added to existing)?')) return;
+      kb = [...kb, ...data];
+      saveKb();
+      toast('Imported ' + data.length + ' entries!', 'ok');
+    } catch { toast('Invalid file.', 'err'); }
+  };
+  r.readAsText(file);
+  e.target.value = '';
+}
+
+function refreshKbUI() {
+  const n = kb.length;
+  document.getElementById('kCount').textContent = n;
+  document.getElementById('kLabel').textContent = '(' + n + ' ' + (n === 1 ? 'entry' : 'entries') + ')';
+  const list = document.getElementById('klist');
+  if (!n) {
+    list.innerHTML = '<div class="empty-k"><div class="ei">🧩</div><p>No knowledge yet.<br>Add your first entry above.</p></div>';
+    return;
+  }
+  list.innerHTML = kb.slice().reverse().map(e =>
+    '<div class="kcard">' +
+      '<div class="kcard-body">' +
+        '<div class="kc-topic">📌 ' + esc(e.topic) + '</div>' +
+        '<div class="kc-ans">' + esc(e.answer) + '</div>' +
+      '</div>' +
+      '<button class="kc-del" onclick="deleteEntry(\'' + e.id + '\')" title="Delete">✕</button>' +
+    '</div>'
+  ).join('');
+}
+
+// ──────────────────────
+//  RESPONSE ENGINE
+//  Rule-based knowledge matching.
+//  Zero external calls.
+// ──────────────────────
+const STOPWORDS = new Set([
+  'the','a','an','is','are','was','were','be','been','am',
+  'it','its','to','of','in','on','at','by','for','with',
+  'and','or','but','what','who','how','when','where','why',
+  'does','do','did','can','could','will','would','should',
+  'i','my','me','we','you','your','this','that','there',
+  'have','has','had','not','no','so','if','then','just',
+  'about','from','up','out','tell','me','give','say'
+]);
+
+function tokenize(text) {
+  return text.toLowerCase().split(/\W+/).filter(w => w.length > 1 && !STOPWORDS.has(w));
+}
+
+function k10respond(query) {
+  if (!kb.length) {
+    return "I haven't been trained on anything yet. Please ask the admin to add some knowledge first.";
+  }
+
+  const q   = query.toLowerCase().trim();
+  const tok = tokenize(q);
+
+  const scored = kb.map(entry => {
+    const tl = entry.topic.toLowerCase();
+    const al = entry.answer.toLowerCase();
+    let score = 0;
+
+    // Exact full match
+    if (tl === q) return { entry, score: 9999 };
+
+    // Substring matches
+    if (tl.includes(q)) score += 80;
+    if (q.includes(tl)) score += 70;
+    if (al.includes(q)) score += 55;
+
+    // Token matches in topic (high value)
+    tok.forEach(t => {
+      if (tl.includes(t)) score += 22;
+      if (al.includes(t)) score += 7;
+    });
+
+    // Bigram bonus
+    for (let i = 0; i < tok.length - 1; i++) {
+      if (tl.includes(tok[i] + ' ' + tok[i+1])) score += 18;
+    }
+
+    // Coverage ratio bonus
+    if (tok.length > 0) {
+      const matched = tok.filter(t => tl.includes(t) || al.includes(t)).length;
+      score += (matched / tok.length) * 25;
+    }
+
+    return { entry, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const best = scored[0];
+
+  if (best.score < 14) {
+    return "I haven't been trained on that topic yet. The admin hasn't added knowledge about it.";
+  }
+
+  return best.entry.answer;
+}
+
+// ──────────────────────
+//  CHAT UI
+// ──────────────────────
+function send() {
+  const el   = document.getElementById('chatInput');
+  const text = el.value.trim();
+  if (!text || busy) return;
+
+  document.getElementById('welcomeMsg').style.display = 'none';
+  addMsg('user', text);
+  el.value = ''; el.style.height = 'auto';
+
+  busy = true;
+  document.getElementById('sendBtn').disabled = true;
+  showTyping();
+
+  setTimeout(() => {
+    removeTyping();
+    addMsg('bot', k10respond(text));
+    busy = false;
+    document.getElementById('sendBtn').disabled = false;
+  }, 480 + Math.random() * 480);
+}
+
+function addMsg(role, text) {
+  const feed = document.getElementById('feed');
+  const div  = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML =
+    '<div class="av ' + (role === 'user' ? 'u' : 'k') + '">' +
+      (role === 'user' ? '👤' : 'K') +
+    '</div>' +
+    '<div class="bubble">' + esc(text) + '</div>';
+  feed.appendChild(div);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function showTyping() {
+  const feed = document.getElementById('feed');
+  const div  = document.createElement('div');
+  div.className = 'msg bot'; div.id = 'typing';
+  div.innerHTML = '<div class="av k">K</div><div class="bubble"><div class="typing-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
+  feed.appendChild(div);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing');
+  if (el) el.remove();
+}
+
+function onKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function grow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+}
+
+// ──────────────────────
+//  ABOUT
+// ──────────────────────
+function setEmbedCode() {
+  const url = window.location.origin + window.location.pathname;
+  document.getElementById('embedCode').textContent =
+'<iframe\n  src="' + url + '"\n  width="100%"\n  height="620"\n  frameborder="0"\n  title="K-10 by L Gamest"\n></iframe>';
+}
+
+function copyEmbed() {
+  navigator.clipboard.writeText(document.getElementById('embedCode').textContent)
+    .then(() => toast('Embed code copied!', 'ok'))
+    .catch(() => toast('Copy failed — please copy manually.', 'err'));
+}
+
+// ──────────────────────
+//  HELPERS
+// ──────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');
+}
+
+let _tt;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (type || 'inf');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
